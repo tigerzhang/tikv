@@ -888,6 +888,7 @@ impl Peer {
         Ok(())
     }
 
+    // TODO: remove do_get once we re-implement get method in tests
     fn do_get(&mut self, ctx: &ExecContext, req: &Request) -> Result<Response> {
         // TODO: the get_get looks wried, maybe we should figure out a better name later.
         let key = req.get_get().get_key();
@@ -902,6 +903,7 @@ impl Peer {
         Ok(resp)
     }
 
+    // TODO: remove do_seek once we re-implement seek method in tests
     fn do_seek(&mut self, ctx: &ExecContext, req: &Request) -> Result<Response> {
         let key = req.get_seek().get_key();
         try!(self.check_data_key(key));
