@@ -33,6 +33,7 @@ pub enum Tick {
     SplitRegionCheck,
     ReplicaCheck,
     PdHeartbeat,
+    DeadPeerCheck,
 }
 
 pub enum Msg {

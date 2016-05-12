@@ -37,6 +37,9 @@ pub enum Task {
     Heartbeat {
         store: metapb::Store,
     },
+    GetRegion {
+        region: metapb::Region,
+    },
 }
 
 
@@ -87,6 +90,7 @@ impl<T: PdClient> Runnable<Task> for Runner<T> {
                 // Now we use put store protocol for heartbeat.
                 self.pd_client.wl().put_store(self.cluster_id, store)
             }
+            Task::GetRegion { region } => self.pd_client.wl().get_region(self.cluster_id, region),
         };
 
         if let Err(e) = res {

@@ -129,6 +129,7 @@ pub struct Peer {
     // if we remove ourself in ChangePeer remove, we should set this flag, then
     // any following committed logs in same Ready should be applied failed.
     penging_remove: bool,
+    inactive: bool,
 }
 
 impl Peer {
@@ -289,8 +290,15 @@ impl Peer {
     pub fn handle_raft_ready<T: Transport>(&mut self,
                                            trans: &Arc<RwLock<T>>)
                                            -> Result<Option<ReadyResult>> {
+        // raise inactive counter every tick
+        // it will be reset if received any raft message
+        self.inactive += 1;
+
         if !self.raft_group.has_ready() {
             return Ok(None);
+        }
+
+        if self.inactive > 10000 {
         }
 
         debug!("handle raft ready: peer {:?}, region {}",
@@ -700,6 +708,19 @@ impl Peer {
         };
 
         Ok((resp, exec_result))
+    }
+
+    fn step_raft(&mut self, m: Message) -> Result<()> {
+        self.inactive = false;
+        self.raft_group.step(msg.take_message())
+    }
+
+    fn set_inactive(&mut self) {
+        self.inactive = true;
+    }
+
+    fn get_inactive(&mut self) -> bool {
+        self.inactive
     }
 }
 
